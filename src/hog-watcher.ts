@@ -1,5 +1,5 @@
 import type { Request } from '@playwright/test';
-import type { CapturedEvent } from './symbols';
+import { isDebugEnabled, type CapturedEvent } from './symbols';
 
 /**
  * Determines if a URL is a PostHog analytics endpoint.
@@ -23,23 +23,23 @@ export function isPostHogRequest(url: string): boolean {
  * - Base64 encoded payloads (if needed)
  */
 export async function extractEventsFromRequest(
-  request: Request,
-  debug: boolean = false
+  request: Request
 ): Promise<CapturedEvent[]> {
   const events: CapturedEvent[] = [];
+  const debug = isDebugEnabled();
 
   try {
     const body = request.postDataJSON();
 
     if (!body) {
       if (debug) {
-        console.log('[playwright-hog] No POST data found in request');
+        console.log('[playwright-posthog] No POST data found in request');
       }
       return events;
     }
 
     if (debug) {
-      console.log('[playwright-hog] Request body:', JSON.stringify(body, null, 2));
+      console.log('[playwright-posthog] Request body:', JSON.stringify(body, null, 2));
     }
 
     if (body.batch && Array.isArray(body.batch)) {
@@ -63,12 +63,12 @@ export async function extractEventsFromRequest(
     }
 
     if (debug && events.length > 0) {
-      console.log(`[playwright-hog] Extracted ${events.length} event(s):`,
+      console.log(`[playwright-posthog] Extracted ${events.length} event(s):`,
         events.map((e: CapturedEvent) => e.event).join(', '));
     }
   } catch (error) {
     if (debug) {
-      console.error('[playwright-hog] Error parsing PostHog request:', error);
+      console.error('[playwright-posthog] Error parsing PostHog request:', error);
     }
   }
 

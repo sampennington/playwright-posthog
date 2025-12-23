@@ -1,0 +1,47 @@
+# Source files (only ship dist)
+src/
+tsconfig.json
+
+# Tests
+tests/
+test-app/
+playwright.config.ts
+playwright-report/
+test-results/
+.playwright/
+
+# Development
+*.spec.ts
+*.test.ts
+.vscode/
+.idea/
+
+# Examples (keep in package for reference)
+!examples/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Documentation (keep README and LICENSE)
+REVIEW.md
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Package manager
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

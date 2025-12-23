@@ -35,3 +35,10 @@ yarn-error.log*
 # Coverage
 coverage/
 .nyc_output/
+
+.tests/
+.test-results/
+test-app/index.html
+tests/events.spec.ts
+playwright.config.ts
+playwright-posthog-*.tgz

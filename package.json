@@ -1,27 +1,32 @@
 {
-  "name": "playwright-hog",
+  "name": "playwright-posthog",
   "version": "1.0.0",
-  "description": "Test PostHog analytics events in your Playwright tests",
+  "description": "Test PostHog analytics events in your Playwright tests with type-safe assertions and automatic event capture",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "files": [
     "dist",
+    "examples",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/global.d.ts dist/global.d.ts",
     "clean": "rm -rf dist",
     "rebuild": "npm run clean && npm run build",
     "prepublishOnly": "npm run rebuild",
-    "test": "playwright test"
+    "test": "npm run build && playwright test",
+    "test:ui": "npm run build && playwright test --ui",
+    "test:debug": "npm run build && playwright test --debug",
+    "serve": "npx http-server test-app -p 8080"
   },
   "keywords": [
     "playwright",
@@ -29,23 +34,35 @@
     "analytics",
     "testing",
     "e2e",
-    "tracking"
+    "tracking",
+    "test",
+    "fixture",
+    "matcher",
+    "assertions",
+    "event-tracking",
+    "product-analytics",
+    "typescript"
   ],
-  "author": "",
+  "author": "playwright-posthog contributors",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "peerDependencies": {
     "@playwright/test": "^1.40.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "@types/node": "^25.0.3",
+    "http-server": "^14.1.1",
     "typescript": "^5.3.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/playwright-hog.git"
+    "url": "git+https://github.com/yourusername/playwright-posthog.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/playwright-hog/issues"
+    "url": "https://github.com/yourusername/playwright-posthog/issues"
   },
-  "homepage": "https://github.com/yourusername/playwright-hog#readme"
+  "homepage": "https://github.com/yourusername/playwright-posthog#readme"
 }

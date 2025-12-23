@@ -10,9 +10,13 @@
 export const kHogEvents = Symbol('hog:events');
 
 /**
- * Symbol key for storing debug configuration.
+ * Check if debug mode is enabled via environment variable.
+ * Supports: DEBUG=true, DEBUG=1, DEBUG=playwright-posthog
  */
-export const kHogDebug = Symbol('hog:debug');
+export function isDebugEnabled(): boolean {
+  const debug = process.env.DEBUG;
+  return debug === 'true' || debug === '1' || debug === 'playwright-posthog';
+}
 
 /**
  * Type definition for the captured event structure

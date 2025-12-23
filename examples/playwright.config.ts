@@ -1,5 +1,5 @@
 /**
- * Example Playwright configuration for playwright-hog
+ * Example Playwright configuration for playwright-posthog
  *
  * See https://playwright.dev/docs/test-configuration
  */
@@ -30,9 +30,6 @@ export default defineConfig({
 
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
-
-    // Enable debug mode for playwright-hog (optional)
-    hogDebug: process.env.HOG_DEBUG === 'true',
   },
 
   // Configure projects for major browsers

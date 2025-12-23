@@ -1,7 +1,10 @@
 import { expect, type Page } from '@playwright/test';
-import { kHogEvents, kHogDebug, type CapturedEvent } from './symbols';
+import { kHogEvents, isDebugEnabled, type CapturedEvent } from './symbols';
 import { matchesProperties } from './hog-watcher';
-import type { HogPage } from './fixtures';
+
+type HogPage = Page & {
+  [kHogEvents]: CapturedEvent[];
+};
 
 /**
  * Configuration for the matcher polling behavior
@@ -37,7 +40,6 @@ const DEFAULT_CONFIG: Required<MatcherConfig> = {
  * @param config - Optional configuration for timeout and polling
  */
 async function toHaveFiredEvent(
-  this: ReturnType<typeof expect>,
   page: Page,
   eventName: string,
   expectedProperties?: Record<string, any>,
@@ -45,13 +47,13 @@ async function toHaveFiredEvent(
 ): Promise<{ pass: boolean; message: () => string }> {
   const hogPage = page as HogPage;
   const { timeout, pollInterval } = { ...DEFAULT_CONFIG, ...config };
-  const debug = hogPage[kHogDebug] || false;
+  const debug = isDebugEnabled();
 
   const startTime = Date.now();
   let foundEvent: CapturedEvent | undefined;
 
   if (debug) {
-    console.log(`[playwright-hog] Checking for event: "${eventName}"`,
+    console.log(`[playwright-posthog] Checking for event: "${eventName}"`,
       expectedProperties ? `with properties: ${JSON.stringify(expectedProperties)}` : '');
   }
 
@@ -66,7 +68,7 @@ async function toHaveFiredEvent(
 
     if (foundEvent) {
       if (debug) {
-        console.log(`[playwright-hog] ✓ Event found after ${Date.now() - startTime}ms`);
+        console.log(`[playwright-posthog] ✓ Event found after ${Date.now() - startTime}ms`);
       }
       break;
     }
@@ -116,13 +118,12 @@ async function toHaveFiredEvent(
 }
 
 async function notToHaveFiredEvent(
-  this: ReturnType<typeof expect>,
   page: Page,
   eventName: string,
   expectedProperties?: Record<string, any>,
   config?: MatcherConfig
 ): Promise<{ pass: boolean; message: () => string }> {
-  const result = await toHaveFiredEvent.call(this, page, eventName, expectedProperties, config);
+  const result = await toHaveFiredEvent(page, eventName, expectedProperties, config);
 
   return {
     pass: !result.pass,
@@ -131,7 +132,6 @@ async function notToHaveFiredEvent(
 }
 
 function toHaveCapturedEvents(
-  this: ReturnType<typeof expect>,
   page: Page,
   count?: number
 ): { pass: boolean; message: () => string } {
