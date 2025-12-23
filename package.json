@@ -1,0 +1,51 @@
+{
+  "name": "playwright-hog",
+  "version": "1.0.0",
+  "description": "Test PostHog analytics events in your Playwright tests",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "prepublishOnly": "npm run rebuild",
+    "test": "playwright test"
+  },
+  "keywords": [
+    "playwright",
+    "posthog",
+    "analytics",
+    "testing",
+    "e2e",
+    "tracking"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/playwright-hog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/playwright-hog/issues"
+  },
+  "homepage": "https://github.com/yourusername/playwright-hog#readme"
+}
