@@ -6,11 +6,11 @@
  */
 
 import { test as base, expect as baseExpect } from '@playwright/test';
-import { withPostHogTracking, hogMatchers } from 'playwright-posthog';
+import { withPostHogTracking, matchers } from 'playwright-posthog';
 
 // Setup: extend your test with PostHog tracking
 const test = withPostHogTracking(base);
-const expect = baseExpect.extend(hogMatchers);
+const expect = baseExpect.extend(matchers);
 
 test.describe('PostHog Analytics Tracking', () => {
   test('basic event tracking', async ({ page }) => {

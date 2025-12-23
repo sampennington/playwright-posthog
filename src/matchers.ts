@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { kHogEvents, isDebugEnabled, type CapturedEvent } from './symbols';
 import { matchesProperties } from './hog-watcher';
 
@@ -159,12 +159,8 @@ function toHaveCapturedEvents(
 /**
  * Export matchers object for composition mode
  */
-export const hogMatchers = {
+export const matchers = {
   toHaveFiredEvent,
   notToHaveFiredEvent,
   toHaveCapturedEvents,
 };
-
-export function installMatchers(): void {
-  expect.extend(hogMatchers);
-}

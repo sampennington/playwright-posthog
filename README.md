@@ -1,36 +1,32 @@
-# playwright-posthog
+# 🦔 playwright-posthog
 
 Test PostHog analytics events in your Playwright tests with ease.
 
-## Features
+## ✨ Features
 
-- **Extends Playwright**: Works with your existing test setup
-- **Type-Safe**: Full TypeScript support with autocomplete
-- **Async Polling**: Waits for analytics events (they're async by nature)
-- **Subset Matching**: Test specific event properties without exact matches
-- **Debug Mode**: Set `DEBUG=true` to see captured events
+- **🔌 Extends Playwright** - Works with your existing test setup
+- **📝 Type-Safe** - Full TypeScript support with autocomplete
+- **⏱️ Async Polling** - Waits for analytics events (they're async by nature)
+- **🎯 Subset Matching** - Test specific event properties without exact matches
+- **🐛 Debug Mode** - Set `DEBUG=true` to see captured events
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install --save-dev playwright-posthog
-# or
-yarn add --dev playwright-posthog
-# or
-pnpm add --save-dev playwright-posthog
 ```
 
-## Setup
+## 🚀 Setup
 
 Extend your Playwright test with PostHog tracking:
 
 ```typescript
 // fixtures.ts
 import { test as base, expect as baseExpect } from '@playwright/test';
-import { withPostHogTracking, hogMatchers } from 'playwright-posthog';
+import { withPostHogTracking, matchers } from 'playwright-posthog';
 
 export const test = withPostHogTracking(base);
-export const expect = baseExpect.extend(hogMatchers);
+export const expect = baseExpect.extend(matchers);
 ```
 
 Then use in your tests:
@@ -44,6 +40,7 @@ test('user signup tracking works', async ({ page }) => {
   await page.getByLabel('Email').fill('user@example.com');
   await page.getByText('Sign Up').click();
 
+  // ✅ Assert the event was fired
   await expect(page).toHaveFiredEvent('user_signed_up', {
     plan: 'pro',
     source: 'web'
@@ -51,7 +48,7 @@ test('user signup tracking works', async ({ page }) => {
 });
 ```
 
-## API Reference
+## 📖 API Reference
 
 ### `withPostHogTracking(test)`
 
@@ -67,12 +64,8 @@ export const test = withPostHogTracking(base);
 Works with already-extended tests too:
 
 ```typescript
-import { test as base } from '@playwright/test';
-import { withPostHogTracking } from 'playwright-posthog';
-
 const testWithAuth = base.extend({
   authenticatedPage: async ({ page }, use) => {
-    await page.goto('/login');
     // ... login logic
     await use(page);
   },
@@ -81,18 +74,18 @@ const testWithAuth = base.extend({
 export const test = withPostHogTracking(testWithAuth);
 ```
 
-### `hogMatchers`
+### `matchers`
 
 Custom matchers to extend Playwright's `expect`:
 
 ```typescript
 import { expect as baseExpect } from '@playwright/test';
-import { hogMatchers } from 'playwright-posthog';
+import { matchers } from 'playwright-posthog';
 
-export const expect = baseExpect.extend(hogMatchers);
+export const expect = baseExpect.extend(matchers);
 ```
 
-### Matchers
+### 🎯 Matchers
 
 #### `toHaveFiredEvent(eventName, properties?, config?)`
 
@@ -115,7 +108,7 @@ await expect(page).toHaveFiredEvent('slow_event', {}, {
 });
 ```
 
-**Properties Matching**: Uses subset matching, meaning the event properties must *contain* the expected properties but can have additional properties.
+> 💡 **Properties Matching**: Uses subset matching - the event properties must *contain* the expected properties but can have additional ones.
 
 #### `notToHaveFiredEvent(eventName, properties?, config?)`
 
@@ -137,19 +130,15 @@ await expect(page).toHaveCapturedEvents();
 await expect(page).toHaveCapturedEvents(5);
 ```
 
-### Debug Mode
+### 🐛 Debug Mode
 
-Enable debug mode via the `DEBUG` environment variable to see captured events in the console:
+Enable debug mode via the `DEBUG` environment variable:
 
 ```bash
 DEBUG=true npx playwright test
-
-# Or use these alternatives
-DEBUG=1 npx playwright test
-DEBUG=playwright-posthog npx playwright test
 ```
 
-### Utility Functions
+### 🛠️ Utility Functions
 
 ```typescript
 import { getCapturedEvents, clearCapturedEvents } from 'playwright-posthog';
@@ -159,40 +148,21 @@ test('advanced usage', async ({ page }) => {
 
   // Get all captured events
   const events = getCapturedEvents(page);
-  console.log('Captured:', events);
 
   // Clear events (useful for multi-step tests)
   clearCapturedEvents(page);
-
-  // Continue testing...
 });
 ```
 
-## How It Works
+## ⚙️ How It Works
 
-1. **Automatic Interception**: The fixture automatically intercepts network requests matching PostHog endpoints (`/e/`, `/capture/`, `/batch/`, `/s/`)
+1. **🔍 Automatic Interception** - Intercepts requests to PostHog endpoints (`/e/`, `/capture/`, `/batch/`, `/s/`)
+2. **🚦 Non-Blocking** - Requests continue to PostHog normally
+3. **📦 Event Extraction** - Handles batch arrays, single events, and nested structures
+4. **🔒 Hidden Storage** - Events stored using Symbols to keep the API clean
+5. **⏳ Async Polling** - Polls for events because analytics are inherently async
 
-2. **Non-Blocking**: Requests are inspected but continue to PostHog normally (using `route.continue()`)
-
-3. **Event Extraction**: Handles various PostHog payload formats:
-   - Single events
-   - Batch arrays
-   - Nested structures
-
-4. **Hidden Storage**: Events are stored on the Page object using TypeScript Symbols, keeping the API clean
-
-5. **Async Polling**: The matcher polls for events because analytics are inherently asynchronous
-
-## Supported PostHog Endpoints
-
-playwright-posthog automatically detects these PostHog endpoints:
-
-- `/e/` - Events endpoint
-- `/capture` - Capture endpoint
-- `/batch` - Batch endpoint
-- `/s/` - Session recording endpoint
-
-## Examples
+## 📚 Examples
 
 ### Testing Event Properties
 
@@ -208,7 +178,7 @@ test('tracks user preferences', async ({ page }) => {
 });
 ```
 
-### Testing Multiple Events
+### Testing a Funnel
 
 ```typescript
 test('tracks funnel events', async ({ page }) => {
@@ -244,37 +214,25 @@ Expected properties: {
 }
 ```
 
-## TypeScript
+## 🔧 Troubleshooting
 
-Full TypeScript support is included. The custom matchers will appear in your IDE autocomplete when you use `expect(page).to...`.
-
-Type definitions are automatically included when you import from `playwright-posthog`.
-
-## Troubleshooting
-
-### Events not being captured
+### Events not being captured?
 
 1. **Enable debug mode** to see what's happening:
    ```bash
    DEBUG=true npx playwright test
    ```
 
-2. **Check the endpoint**: Ensure PostHog is sending to a supported endpoint
+2. **Check the endpoint** - Ensure PostHog is sending to a supported endpoint
 
-3. **Verify PostHog initialization**: Make sure PostHog is actually loaded on your page
+3. **Verify PostHog initialization** - Make sure PostHog is loaded on your page
 
-### False negatives
-
-If events are being sent but not matched:
+### False negatives?
 
 1. Check the event name (case-sensitive)
 2. Use debug mode to see actual property values
 3. Remember that property matching is subset-based
 
-## Contributing
-
-Contributions are welcome! Please open an issue or PR on GitHub.
-
-## License
+## 📄 License
 
 MIT

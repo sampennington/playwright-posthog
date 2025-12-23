@@ -7,10 +7,10 @@
  * ```typescript
  * // fixtures.ts
  * import { test as base, expect as baseExpect } from '@playwright/test';
- * import { withPostHogTracking, hogMatchers } from 'playwright-posthog';
+ * import { withPostHogTracking, matchers } from 'playwright-posthog';
  *
  * export const test = withPostHogTracking(base);
- * export const expect = baseExpect.extend(hogMatchers);
+ * export const expect = baseExpect.extend(matchers);
  * ```
  *
  * @example
@@ -35,7 +35,7 @@ import { kHogEvents, isDebugEnabled, type CapturedEvent } from './symbols';
 import { isPostHogRequest, extractEventsFromRequest } from './hog-watcher';
 import type { Page, Route, Request, TestType } from '@playwright/test';
 
-export { hogMatchers } from './matchers';
+export { matchers } from './matchers';
 
 /**
  * Extended Page type that includes the internal storage symbols
