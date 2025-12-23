@@ -6,20 +6,8 @@ type HogPage = Page & {
   [kHogEvents]: CapturedEvent[];
 };
 
-/**
- * Configuration for the matcher polling behavior
- */
 export interface MatcherConfig {
-  /**
-   * Maximum time to wait for the event (in milliseconds)
-   * @default 2000
-   */
   timeout?: number;
-
-  /**
-   * Interval between polling attempts (in milliseconds)
-   * @default 100
-   */
   pollInterval?: number;
 }
 
@@ -28,17 +16,58 @@ const DEFAULT_CONFIG: Required<MatcherConfig> = {
   pollInterval: 100,
 };
 
-/**
- * Custom matcher: toHaveFiredEvent
- *
- * Checks if a PostHog event with the given name and properties was captured.
- * Uses async polling to account for the asynchronous nature of analytics.
- *
- * @param page - The Playwright page object
- * @param eventName - The name of the event to check for
- * @param expectedProperties - Optional properties to match (subset matching)
- * @param config - Optional configuration for timeout and polling
- */
+function formatProps(props?: Record<string, any>): string {
+  return props ? ` with properties ${JSON.stringify(props)}` : '';
+}
+
+function formatEventList(events: CapturedEvent[]): string {
+  return events.map(e => e.event).join(', ');
+}
+
+function buildFailureMessage(
+  eventName: string,
+  expectedProperties: Record<string, any> | undefined,
+  timeout: number,
+  events: CapturedEvent[]
+): string {
+  const lines: string[] = [
+    `Expected page to have fired event "${eventName}"${formatProps(expectedProperties)}, but it did not.`,
+    '',
+    `Waited ${timeout}ms and captured ${events.length} total event(s).`,
+    '',
+  ];
+
+  if (events.length === 0) {
+    lines.push(
+      'No PostHog events were captured at all. Possible reasons:',
+      '  • PostHog is not initialized on the page',
+      '  • The event is sent to a different endpoint',
+      '  • Network interception is not working'
+    );
+  } else {
+    const matchingEvents = events.filter(e => e.event === eventName);
+
+    if (matchingEvents.length > 0) {
+      lines.push(
+        `Found ${matchingEvents.length} event(s) named "${eventName}" but properties didn't match:`,
+        ''
+      );
+      matchingEvents.forEach((event, i) => {
+        lines.push(`  Event ${i + 1}: ${JSON.stringify(event.properties, null, 2)}`);
+      });
+      lines.push('', `Expected: ${JSON.stringify(expectedProperties, null, 2)}`);
+    } else {
+      lines.push(
+        `Events captured: [${formatEventList(events)}]`,
+        '',
+        'The event name did not match any captured events.'
+      );
+    }
+  }
+
+  return lines.join('\n');
+}
+
 async function toHaveFiredEvent(
   page: Page,
   eventName: string,
@@ -49,26 +78,23 @@ async function toHaveFiredEvent(
   const { timeout, pollInterval } = { ...DEFAULT_CONFIG, ...config };
   const debug = isDebugEnabled();
 
+  if (debug) {
+    console.log(`[playwright-posthog] Looking for: "${eventName}"${formatProps(expectedProperties)}`);
+  }
+
   const startTime = Date.now();
   let foundEvent: CapturedEvent | undefined;
-
-  if (debug) {
-    console.log(`[playwright-posthog] Checking for event: "${eventName}"`,
-      expectedProperties ? `with properties: ${JSON.stringify(expectedProperties)}` : '');
-  }
 
   while (Date.now() - startTime < timeout) {
     const events = hogPage[kHogEvents] || [];
 
     foundEvent = events.find((event: CapturedEvent) => {
-      const nameMatches = event.event === eventName;
-      const propsMatch = matchesProperties(event.properties, expectedProperties);
-      return nameMatches && propsMatch;
+      return event.event === eventName && matchesProperties(event.properties, expectedProperties);
     });
 
     if (foundEvent) {
       if (debug) {
-        console.log(`[playwright-posthog] ✓ Event found after ${Date.now() - startTime}ms`);
+        console.log(`[playwright-posthog] ✓ Found after ${Date.now() - startTime}ms`);
       }
       break;
     }
@@ -78,43 +104,15 @@ async function toHaveFiredEvent(
 
   const pass = !!foundEvent;
 
-  const message = () => {
-    if (pass) {
-      return `Expected page NOT to have fired event "${eventName}"${
-        expectedProperties ? ` with properties ${JSON.stringify(expectedProperties)}` : ''
-      }, but it did.`;
-    } else {
-      const events = hogPage[kHogEvents] || [];
-      const eventNames = events.map((e: CapturedEvent) => e.event);
-      const matchingNameEvents = events.filter((e: CapturedEvent) => e.event === eventName);
-
-      let msg = `Expected page to have fired event "${eventName}"${
-        expectedProperties ? ` with properties ${JSON.stringify(expectedProperties)}` : ''
-      }, but it did not.\n\n`;
-
-      msg += `Waited ${timeout}ms and captured ${events.length} total event(s).\n\n`;
-
-      if (events.length === 0) {
-        msg += 'No PostHog events were captured at all. Possible reasons:\n';
-        msg += '  • PostHog is not initialized on the page\n';
-        msg += '  • The event is sent to a different endpoint\n';
-        msg += '  • Network interception is not working\n';
-      } else if (matchingNameEvents.length > 0) {
-        msg += `Found ${matchingNameEvents.length} event(s) with name "${eventName}" but properties didn't match:\n\n`;
-        matchingNameEvents.forEach((event: CapturedEvent, index: number) => {
-          msg += `  Event ${index + 1}: ${JSON.stringify(event.properties, null, 2)}\n`;
-        });
-        msg += `\nExpected properties: ${JSON.stringify(expectedProperties, null, 2)}\n`;
-      } else {
-        msg += `Event names captured: [${eventNames.join(', ')}]\n\n`;
-        msg += 'The event name did not match any captured events.\n';
+  return {
+    pass,
+    message: () => {
+      if (pass) {
+        return `Expected page NOT to have fired event "${eventName}"${formatProps(expectedProperties)}, but it did.`;
       }
-
-      return msg;
-    }
+      return buildFailureMessage(eventName, expectedProperties, timeout, hogPage[kHogEvents] || []);
+    },
   };
-
-  return { pass, message };
 }
 
 async function notToHaveFiredEvent(
@@ -124,41 +122,32 @@ async function notToHaveFiredEvent(
   config?: MatcherConfig
 ): Promise<{ pass: boolean; message: () => string }> {
   const result = await toHaveFiredEvent(page, eventName, expectedProperties, config);
-
-  return {
-    pass: !result.pass,
-    message: result.message,
-  };
+  return { pass: !result.pass, message: result.message };
 }
 
 function toHaveCapturedEvents(
   page: Page,
   count?: number
 ): { pass: boolean; message: () => string } {
-  const hogPage = page as HogPage;
-  const events = hogPage[kHogEvents] || [];
-  const actualCount = events.length;
+  const events = (page as HogPage)[kHogEvents] || [];
+  const actual = events.length;
+  const pass = count === undefined ? actual > 0 : actual === count;
 
-  const pass = count === undefined ? actualCount > 0 : actualCount === count;
-
-  const message = () => {
-    if (count === undefined) {
+  return {
+    pass,
+    message: () => {
+      if (count === undefined) {
+        return pass
+          ? `Expected no events, but captured ${actual}.`
+          : `Expected events, but none were captured.`;
+      }
       return pass
-        ? `Expected page NOT to have captured any events, but captured ${actualCount}.`
-        : `Expected page to have captured events, but none were captured.`;
-    } else {
-      return pass
-        ? `Expected page NOT to have captured ${count} event(s), but it did.`
-        : `Expected page to have captured ${count} event(s), but captured ${actualCount}.\n\nEvents: ${events.map((e: CapturedEvent) => e.event).join(', ')}`;
-    }
+        ? `Expected NOT to capture ${count} event(s), but did.`
+        : `Expected ${count} event(s), got ${actual}. Events: [${formatEventList(events)}]`;
+    },
   };
-
-  return { pass, message };
 }
 
-/**
- * Export matchers object for composition mode
- */
 export const matchers = {
   toHaveFiredEvent,
   notToHaveFiredEvent,

@@ -1,14 +1,6 @@
 # 🦔 playwright-posthog
 
-Test PostHog analytics events in your Playwright tests with ease.
-
-## ✨ Features
-
-- **🔌 Extends Playwright** - Works with your existing test setup
-- **📝 Type-Safe** - Full TypeScript support with autocomplete
-- **⏱️ Async Polling** - Waits for analytics events (they're async by nature)
-- **🎯 Subset Matching** - Test specific event properties without exact matches
-- **🐛 Debug Mode** - Set `DEBUG=true` to see captured events
+Playwright matchers for testing PostHog analytics events.
 
 ## 📦 Installation
 
@@ -154,14 +146,6 @@ test('advanced usage', async ({ page }) => {
 });
 ```
 
-## ⚙️ How It Works
-
-1. **🔍 Automatic Interception** - Intercepts requests to PostHog endpoints (`/e/`, `/capture/`, `/batch/`, `/s/`)
-2. **🚦 Non-Blocking** - Requests continue to PostHog normally
-3. **📦 Event Extraction** - Handles batch arrays, single events, and nested structures
-4. **🔒 Hidden Storage** - Events stored using Symbols to keep the API clean
-5. **⏳ Async Polling** - Polls for events because analytics are inherently async
-
 ## 📚 Examples
 
 ### Testing Event Properties
@@ -192,46 +176,6 @@ test('tracks funnel events', async ({ page }) => {
   await expect(page).toHaveFiredEvent('checkout_started');
 });
 ```
-
-### Debugging Failed Assertions
-
-When an assertion fails, you get detailed error messages:
-
-```
-Expected page to have fired event "user_signed_up" with properties {"plan":"pro"}, but it did not.
-
-Waited 2000ms and captured 3 total event(s).
-
-Found 1 event(s) with name "user_signed_up" but properties didn't match:
-
-  Event 1: {
-    "plan": "free",
-    "source": "web"
-  }
-
-Expected properties: {
-  "plan": "pro"
-}
-```
-
-## 🔧 Troubleshooting
-
-### Events not being captured?
-
-1. **Enable debug mode** to see what's happening:
-   ```bash
-   DEBUG=true npx playwright test
-   ```
-
-2. **Check the endpoint** - Ensure PostHog is sending to a supported endpoint
-
-3. **Verify PostHog initialization** - Make sure PostHog is loaded on your page
-
-### False negatives?
-
-1. Check the event name (case-sensitive)
-2. Use debug mode to see actual property values
-3. Remember that property matching is subset-based
 
 ## 📄 License
 
