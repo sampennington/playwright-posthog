@@ -21,6 +21,20 @@ export const test = withPostHogTracking(base);
 export const expect = baseExpect.extend(matchers);
 ```
 
+### Configure PostHog for Testing
+
+PostHog needs specific settings to work reliably in Playwright tests. Add these conditionally in your app:
+
+```typescript
+posthog.init('your-api-key', {
+  // Disable bot detection - Playwright is detected as a bot
+  opt_out_useragent_filter: process.env.NODE_ENV === 'test',
+
+  // Disable batching in tests - events send immediately
+  request_batching: process.env.NODE_ENV !== 'test',
+});
+```
+
 Then use in your tests:
 
 ```typescript
