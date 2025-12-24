@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { kHogEvents, isDebugEnabled, type CapturedEvent } from './symbols';
-import { matchesProperties } from './hog-watcher';
+import isMatch from 'lodash.ismatch';
 
 type HogPage = Page & {
   [kHogEvents]: CapturedEvent[];
@@ -84,12 +84,13 @@ async function toHaveFiredEvent(
 
   const startTime = Date.now();
   let foundEvent: CapturedEvent | undefined;
+  const propsToMatch = expectedProperties || {};
 
   while (Date.now() - startTime < timeout) {
     const events = hogPage[kHogEvents] || [];
 
     foundEvent = events.find((event: CapturedEvent) => {
-      return event.event === eventName && matchesProperties(event.properties, expectedProperties);
+      return event.event === eventName && isMatch(event.properties || {}, propsToMatch);
     });
 
     if (foundEvent) {
