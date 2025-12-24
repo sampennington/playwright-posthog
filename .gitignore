@@ -38,7 +38,7 @@ coverage/
 
 .tests/
 .test-results/
-test-app/index.html
+test-app/
 tests/events.spec.ts
 playwright.config.ts
-playwright-posthog-*.tgz
+posthog-playwright-*.tgz

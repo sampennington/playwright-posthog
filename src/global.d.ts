@@ -1,5 +1,5 @@
 /**
- * Type declarations for playwright-posthog custom matchers
+ * Type declarations for posthog-playwright custom matchers
  *
  * This file extends Playwright's expect API to include PostHog-specific matchers.
  */

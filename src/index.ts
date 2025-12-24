@@ -26,7 +26,7 @@ export function withPostHogTracking<T extends TestType<any, any>>(test: T): T {
         const postDataBuffer = request.postDataBuffer();
 
         if (debug) {
-          console.log(`[playwright-posthog] Intercepted: ${url}`);
+          console.log(`[posthog-playwright] Intercepted: ${url}`);
         }
 
         if (postDataBuffer) {
@@ -38,7 +38,7 @@ export function withPostHogTracking<T extends TestType<any, any>>(test: T): T {
             hogPage[kHogEvents].push(...events);
 
             if (debug && events.length > 0) {
-              console.log(`[playwright-posthog] Captured ${events.length} event(s)`);
+              console.log(`[posthog-playwright] Captured ${events.length} event(s)`);
             }
           } catch {
             // Not gzip/JSON - ignore
@@ -51,7 +51,7 @@ export function withPostHogTracking<T extends TestType<any, any>>(test: T): T {
       await use(hogPage);
 
       if (debug) {
-        console.log(`[playwright-posthog] Test complete. Total: ${hogPage[kHogEvents].length} event(s)`);
+        console.log(`[posthog-playwright] Test complete. Total: ${hogPage[kHogEvents].length} event(s)`);
       }
     },
   }) as T;

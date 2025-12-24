@@ -1,5 +1,5 @@
 {
-  "name": "playwright-posthog",
+  "name": "posthog-playwright",
   "version": "1.0.0",
   "description": "Test PostHog analytics events in your Playwright tests with type-safe assertions and automatic event capture",
   "main": "./dist/index.js",
@@ -43,7 +43,7 @@
     "product-analytics",
     "typescript"
   ],
-  "author": "playwright-posthog contributors",
+  "author": "posthog-playwright contributors",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0"
@@ -60,12 +60,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/playwright-posthog.git"
+    "url": "git+https://github.com/yourusername/posthog-playwright.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/playwright-posthog/issues"
+    "url": "https://github.com/yourusername/posthog-playwright/issues"
   },
-  "homepage": "https://github.com/yourusername/playwright-posthog#readme",
+  "homepage": "https://github.com/yourusername/posthog-playwright#readme",
   "dependencies": {
     "lodash.ismatch": "^4.4.0"
   }

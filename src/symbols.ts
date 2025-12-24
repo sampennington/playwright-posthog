@@ -11,11 +11,11 @@ export const kHogEvents = Symbol('hog:events');
 
 /**
  * Check if debug mode is enabled via environment variable.
- * Supports: DEBUG=true, DEBUG=1, DEBUG=playwright-posthog
+ * Supports: DEBUG=true, DEBUG=1, DEBUG=posthog-playwright
  */
 export function isDebugEnabled(): boolean {
   const debug = process.env.DEBUG;
-  return debug === 'true' || debug === '1' || debug === 'playwright-posthog';
+  return debug === 'true' || debug === '1' || debug === 'posthog-playwright';
 }
 
 /**

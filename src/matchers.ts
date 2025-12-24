@@ -79,7 +79,7 @@ async function toHaveFiredEvent(
   const debug = isDebugEnabled();
 
   if (debug) {
-    console.log(`[playwright-posthog] Looking for: "${eventName}"${formatProps(expectedProperties)}`);
+    console.log(`[posthog-playwright] Looking for: "${eventName}"${formatProps(expectedProperties)}`);
   }
 
   const startTime = Date.now();
@@ -95,7 +95,7 @@ async function toHaveFiredEvent(
 
     if (foundEvent) {
       if (debug) {
-        console.log(`[playwright-posthog] ✓ Found after ${Date.now() - startTime}ms`);
+        console.log(`[posthog-playwright] ✓ Found after ${Date.now() - startTime}ms`);
       }
       break;
     }

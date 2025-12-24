@@ -4,7 +4,7 @@ export function extractEventsFromBody(body: any, debug: boolean = false): Captur
   if (!body) return [];
 
   if (debug) {
-    console.log('[playwright-posthog] Parsing body:', JSON.stringify(body, null, 2));
+    console.log('[posthog-playwright] Parsing body:', JSON.stringify(body, null, 2));
   }
 
   const rawEvents = body.batch ?? body.data ?? (Array.isArray(body) ? body : [body]);

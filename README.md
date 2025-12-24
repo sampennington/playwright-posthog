@@ -1,11 +1,11 @@
-# 🦔 playwright-posthog
+# 🦔 posthog-playwright
 
-Playwright matchers for testing PostHog analytics events.
+Playwright matchers for testing PostHog analytics events. Intercepts PostHog network requests and captures events, letting you assert that the right analytics events fire during your E2E tests.
 
 ## 📦 Installation
 
 ```bash
-npm install --save-dev playwright-posthog
+npm install --save-dev posthog-playwright
 ```
 
 ## 🚀 Setup
@@ -15,7 +15,7 @@ Extend your Playwright test with PostHog tracking:
 ```typescript
 // fixtures.ts
 import { test as base, expect as baseExpect } from '@playwright/test';
-import { withPostHogTracking, matchers } from 'playwright-posthog';
+import { withPostHogTracking, matchers } from 'posthog-playwright';
 
 export const test = withPostHogTracking(base);
 export const expect = baseExpect.extend(matchers);
@@ -62,7 +62,7 @@ Extends a Playwright test instance with PostHog event tracking on the `page` fix
 
 ```typescript
 import { test as base } from '@playwright/test';
-import { withPostHogTracking } from 'playwright-posthog';
+import { withPostHogTracking } from 'posthog-playwright';
 
 export const test = withPostHogTracking(base);
 ```
@@ -86,7 +86,7 @@ Custom matchers to extend Playwright's `expect`:
 
 ```typescript
 import { expect as baseExpect } from '@playwright/test';
-import { matchers } from 'playwright-posthog';
+import { matchers } from 'posthog-playwright';
 
 export const expect = baseExpect.extend(matchers);
 ```
@@ -147,7 +147,7 @@ DEBUG=true npx playwright test
 ### 🛠️ Utility Functions
 
 ```typescript
-import { getCapturedEvents, clearCapturedEvents } from 'playwright-posthog';
+import { getCapturedEvents, clearCapturedEvents } from 'posthog-playwright';
 
 test('advanced usage', async ({ page }) => {
   await page.goto('/');

@@ -1,12 +1,12 @@
 /**
- * Example test file demonstrating playwright-posthog usage
+ * Example test file demonstrating posthog-playwright usage
  *
  * This file shows various patterns for testing PostHog analytics
  * events in your Playwright tests.
  */
 
 import { test as base, expect as baseExpect } from '@playwright/test';
-import { withPostHogTracking, matchers } from 'playwright-posthog';
+import { withPostHogTracking, matchers } from 'posthog-playwright';
 
 // Setup: extend your test with PostHog tracking
 const test = withPostHogTracking(base);
@@ -91,7 +91,7 @@ test.describe('PostHog Analytics Tracking', () => {
 
 test.describe('Advanced Usage', () => {
   test('using utility functions', async ({ page }) => {
-    const { getCapturedEvents, clearCapturedEvents } = await import('playwright-posthog');
+    const { getCapturedEvents, clearCapturedEvents } = await import('posthog-playwright');
 
     await page.goto('https://example.com/step1');
 
